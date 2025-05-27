@@ -50,7 +50,7 @@
 ## 🗂️ Estrutura do Projeto
 
 ```
-📦 1TIAOR20242-Challenge-Ingredion-Sprint-3
+📦 1TIAOR20242-Global-Solutions-GS-20251
 ```
 
 ---

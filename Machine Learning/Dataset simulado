@@ -1,0 +1,24 @@
+import pandas as pd
+import numpy as np
+
+# Define numeor de amostras
+n = 1000
+
+# Simula os dados dos potenciometros e acelerometro
+data = {
+    'pot1': np.random.randint(0, 4096, n),
+    'pot2': np.random.randint(0, 4096, n),
+    'ax': np.random.randint(-16000, 16000, n),
+    'ay': np.random.randint(-16000, 16000, n),
+    'az': np.random.randint(-16000, 16000, n),
+}
+
+# Define parametros para o alerta
+data['alerta'] = (
+    (data['pot1'] > 3500) |
+    (data['az'] > 15000)
+).astype(int)
+
+# Cria o DataFrame e salvar arquivo CSV
+df = pd.DataFrame(data)
+df.to_csv('dataset_simulado.csv', index=False)

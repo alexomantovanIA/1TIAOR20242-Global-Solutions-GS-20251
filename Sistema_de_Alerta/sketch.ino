@@ -8,7 +8,7 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 // MQTT Broker
-const char* mqtt_server = "broker.hivemq.com";
+const char* mqtt_server = "mqtt.eclipseprojects.io";
 WiFiClient espClient;
 PubSubClient client(espClient);
 

@@ -1,0 +1,21 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+
+# Carrega o dataset
+df = pd.read_csv('dataset_simulado.csv')
+
+# Define X e y
+X = df[['pot1', 'pot2', 'ax', 'ay', 'az']]
+y = df['alerta']
+
+# Divide os dados
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Treina o modelo
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Salva o modelo como .pkl
+joblib.dump(model, 'modelo_alerta.pkl')

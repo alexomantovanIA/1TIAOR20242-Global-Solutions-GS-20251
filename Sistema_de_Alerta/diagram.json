@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "author": "Edmar Souza",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": -78.1, "left": -163.4, "attrs": {} },
+    {
+      "type": "wokwi-slide-potentiometer",
+      "id": "pot2",
+      "top": 245,
+      "left": -193,
+      "attrs": { "travelLength": "30" }
+    },
+    { "type": "wokwi-mpu6050", "id": "imu1", "top": -5.78, "left": 194.32, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "pot1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "pot2:VCC", "esp:3V3", "red", [ "h0", "v-259.2" ] ],
+    [ "pot2:GND", "esp:GND.1", "black", [ "v-38.4", "h-33.2", "v-96" ] ],
+    [ "pot1:GND", "esp:GND.1", "black", [ "v163.2" ] ],
+    [ "pot1:SIG", "esp:34", "green", [ "v0" ] ],
+    [ "pot2:SIG", "esp:35", "green", [ "h-19.2", "v-240.8" ] ],
+    [ "imu1:SDA", "esp:21", "green", [ "v-9.6", "h-47.92", "v76.8" ] ],
+    [ "imu1:VCC", "esp:3V3", "red", [ "v-67.2", "h-268.72", "v96" ] ],
+    [ "imu1:SCL", "esp:22", "green", [ "v-19.2", "h-76.72", "v76.8" ] ],
+    [ "imu1:GND", "esp:GND.2", "black", [ "v-38.4", "h-163.12" ] ]
+  ],
+  "dependencies": [
+    "knolleary/PubSubClient",
+    "jrowberg/i2cdevlib"
+  ]
+}

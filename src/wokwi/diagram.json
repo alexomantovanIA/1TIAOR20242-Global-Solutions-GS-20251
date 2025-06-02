@@ -12,7 +12,21 @@
       "left": -193,
       "attrs": { "travelLength": "30" }
     },
-    { "type": "wokwi-mpu6050", "id": "imu1", "top": -5.78, "left": 194.32, "attrs": {} }
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu1",
+      "top": -45.02,
+      "left": 310.12,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 236.8,
+      "left": 284,
+      "attrs": { "pins": "i2c" }
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -26,10 +40,11 @@
     [ "imu1:SDA", "esp:21", "green", [ "v-9.6", "h-47.92", "v76.8" ] ],
     [ "imu1:VCC", "esp:3V3", "red", [ "v-67.2", "h-268.72", "v96" ] ],
     [ "imu1:SCL", "esp:22", "green", [ "v-19.2", "h-76.72", "v76.8" ] ],
-    [ "imu1:GND", "esp:GND.2", "black", [ "v-38.4", "h-163.12" ] ]
+    [ "imu1:GND", "esp:GND.2", "black", [ "v-38.4", "h-163.12" ] ],
+    [ "esp:GND.2", "lcd1:GND", "black", [ "h81.64", "v240" ] ],
+    [ "esp:3V3", "lcd1:VCC", "red", [ "h-23.81", "v201.6", "h191.62", "v47.9" ] ],
+    [ "esp:21", "lcd1:SDA", "green", [ "h43.24", "v19.2", "h86.32", "v191.8" ] ],
+    [ "esp:22", "lcd1:SCL", "green", [ "h43.24", "v9.6", "h67.12", "v239.7" ] ]
   ],
-  "dependencies": [
-    "knolleary/PubSubClient",
-    "jrowberg/i2cdevlib"
-  ]
+  "dependencies": {}
 }

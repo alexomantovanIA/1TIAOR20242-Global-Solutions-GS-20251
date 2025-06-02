@@ -1,3 +1,4 @@
+
 # FIAP - Faculdade de Informática e Administração Paulista
 
 <p align="center">
@@ -6,9 +7,8 @@
 
 ---
 
-# Global Solotions (GS) 2025.1
-
-### Fase 7
+# Global Solutions (GS) 2025.1  
+## Fase 7 — Previsão de Deslizamentos com IoT + ML
 
 ---
 
@@ -29,21 +29,53 @@
 
 ## 📌 Descrição do Projeto
 
+Esta solução tem como objetivo prever e monitorar riscos de deslizamentos de terra, utilizando sensores simulados, ESP32, MQTT, SQLite e Machine Learning. 
+
+A arquitetura executa inferência em tempo real logo após a recepção dos dados. Ao identificar a classe “risco”, um alerta é automaticamente enviado via AWS SNS. Todo o histórico é armazenado localmente e pode ser analisado por um dashboard em Jupyter Notebook.
+
 ---
 
 ## 📦 Entregáveis
 
+- Simulação com ESP32 no Wokwi (chuva, umidade, vibração)
+- Coletor MQTT com inferência imediata (`coletor_inferente_mqtt.py`)
+- Modelo treinado (`modelo_multiclasse_ajustado_v2.pkl`)
+- Banco SQLite com leituras, inferências e alertas
+- Notebook com análise estatística e visual (`analise_inferencias.ipynb`)
+- PDF com documentação e arquitetura do sistema
+- Repositório GitHub público e vídeo demonstrativo
+
 ---
 
-## 🧪 Metodologia
+## 🔧 Tecnologias e Metodologia
+
+- **Sensores**: potenciômetro (chuva e umidade), MPU6050 (vibração eixo Z)
+- **Transmissão**: MQTT no tópico `gs2025/grupo11/deslizamento`
+- **Processamento**: inferência imediata com RandomForest em Python
+- **Armazenamento**: banco SQLite local com estrutura normalizada
+- **Alertas**: integração com Amazon SNS para envio automático
+- **Análise de dados**: gráficos em Seaborn e Matplotlib (Jupyter Notebook)
+- **Boas práticas**: uso de `.env`, estrutura modular e separação de responsabilidades
 
 ---
 
-## 📈 Visualizações (Exemplo)
+## 📊 Métricas e Classificação
+
+- Entrada: umidade (%), chuva (nível), acc_z (vibração)
+- Saída: classe predita (`ok`, `atencao`, `risco`)
+- Inferência realizada **em tempo real**
+- Envio de alerta quando `classe == risco`
 
 ---
 
-## 📊 Métricas Calculadas
+## 📈 Visualizações no Notebook
+
+- Correlação entre sensores
+- Distribuição temporal de alertas
+- Dispersão entre chuva e aceleração
+- Evolução temporal dos sensores
+- Frequência de classificações (ok, atenção, risco)
+- Análise de médias e desvios por classe
 
 ---
 
@@ -51,11 +83,52 @@
 
 ```
 📦 1TIAOR20242-Global-Solutions-GS-20251
+├── assets/
+│   └── logo-fiap.png
+├── data/
+│   └── gs_deslizamento.db
+├── ml/
+│   └── modelo_multiclasse_ajustado_v2.pkl
+├── src/
+│   │── ml/
+│   │   └── modelo_treinado_multiclasse.py
+│   ├── mqtt_pipeline/
+│   │   └── coletor_inferente_mqtt.py
+│   ├── visualizacao/
+│   │   └── analise_inferencias.ipynb
+│   └── wokwi/
+│       └── diagram.json, libraries.txt, sketch.ino, wokwi-project
+├── .env.example
+├── requirements.txt
+├── README.md
+└── GS_2025_Entrega_Final.pdf
 ```
 
 ---
 
 ## ✅ Requisitos para Execução
+
+1. Clonar o repositório
+2. Criar `.env` a partir de `.env.example`
+3. Instalar dependências:
+```bash
+pip install -r requirements.txt
+```
+4. Executar:
+```bash
+python src/coletor_inferente_mqtt.py
+```
+
+5. Visualizar análises:
+```bash
+jupyter notebook src/visualizacao/analise_inferencias.ipynb
+```
+
+---
+
+## 📽️ Demonstração em Vídeo
+
+[🔗 Link para o vídeo demonstrativo (YouTube - não listado)](https://youtube.com/exemplo-nao-listado)
 
 ---
 

@@ -175,3 +175,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Local configuration file for the variable substitution feature
+.env
+
+*.db

@@ -1,43 +1,90 @@
+# modelo_treinado_multiclasse.py
+"""
+Treinamento de modelo de classificação multiclasse para prever risco de deslizamento
+com base em sensores: umidade, chuva e vibração no eixo Z (acc_z).
+As classes são: "ok", "atencao" e "risco".
+"""
 
-import numpy as np
 import pandas as pd
+import numpy as np
+import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-import joblib
+from sklearn.metrics import classification_report
+import os
 
-# Geração de dados simulados
-n = 1000
-df = pd.DataFrame({
-    'pot1': np.random.randint(0, 4096, n),
-    'pot2': np.random.randint(0, 4096, n),
-    'ax': np.random.randint(-16000, 16000, n),
-    'ay': np.random.randint(-16000, 16000, n),
-    'az': np.random.randint(-16000, 16000, n),
+# ------------------------------
+# 1. Geração de dados simulados
+# ------------------------------
+
+np.random.seed(42)
+
+# Classe "ok"
+ok_data = pd.DataFrame({
+    'umidade': np.random.uniform(60, 100, 100),
+    'chuva': np.random.uniform(0, 60, 100),
+    'acc_z': np.random.uniform(-3, 3, 100),
+    'classe': 'ok'
 })
 
-# Cálculo de intensidade de vibração
-df['vib_total'] = df[['ax', 'ay', 'az']].abs().max(axis=1)
+# Classe "atencao"
+atencao_data = pd.DataFrame({
+    'umidade': np.random.uniform(40, 59, 100),
+    'chuva': np.random.uniform(60, 120, 100),
+    'acc_z': np.random.uniform(-6, -3, 100),
+    'classe': 'atencao'
+})
 
-# Classificação multiclasse:
-# 0 = OK, 1 = ATENÇÃO, 2 = RISCO
-def classificar(row):
-    if row['pot2'] > 3000 and row['vib_total'] > 10000:
-        return 'RISCO'
-    elif row['pot2'] > 2000 or row['vib_total'] > 7000:
-        return 'ATENÇÃO'
-    else:
-        return 'OK'
+# Classe "risco"
+risco_data = pd.DataFrame({
+    'umidade': np.random.uniform(0, 39, 100),
+    'chuva': np.random.uniform(120, 150, 100),
+    'acc_z': np.random.uniform(-20, -6, 100),
+    'classe': 'risco'
+})
 
-df['classificacao'] = df.apply(classificar, axis=1)
+# Junta todos os dados
+df = pd.concat([ok_data, atencao_data, risco_data], ignore_index=True)
 
-# Treinamento do modelo
-X = df[['pot1', 'pot2', 'ax', 'ay', 'az']]
-y = df['classificacao']
+# Embaralha os dados
+df = df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+# ------------------------------
+# 2. Separação em treino/teste
+# ------------------------------
+
+X = df[['umidade', 'chuva', 'acc_z']]
+y = df['classe']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-modelo = RandomForestClassifier(n_estimators=100, random_state=42)
-modelo.fit(X_train, y_train)
 
-# Salvar modelo multiclasse
-joblib.dump(modelo, 'modelo_multiclasse.pkl')
-print("Modelo salvo como modelo_multiclasse.pkl")
+# ------------------------------
+# 3. Treinamento do modelo
+# ------------------------------
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# ------------------------------
+# 4. Avaliação do modelo
+# ------------------------------
+
+y_pred = model.predict(X_test)
+print("📊 Relatório de Classificação:")
+print(classification_report(y_test, y_pred))
+
+# ------------------------------
+# 5. Salvamento do modelo
+# ------------------------------
+
+# Caminho para salvar o modelo
+save_path = os.path.join("ml", "modelo_multiclasse_ajustado_v2.pkl")
+
+# Garante que a pasta exista
+os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+# Salva com pickle
+with open(save_path, "wb") as f:
+    pickle.dump(model, f)
+
+print(f"✅ Modelo salvo com sucesso em: {save_path}")

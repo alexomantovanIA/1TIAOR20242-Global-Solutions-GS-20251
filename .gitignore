@@ -178,5 +178,3 @@ cython_debug/
 
 # Local configuration file for the variable substitution feature
 .env
-
-*.db

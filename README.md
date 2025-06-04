@@ -116,7 +116,7 @@ pip install -r requirements.txt
 ```
 4. Executar:
 ```bash
-python src/coletor_inferente_mqtt.py
+python src/mqtt_pipeline/coletor_inferente_mqtt.py
 ```
 
 5. Visualizar análises:

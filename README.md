@@ -119,7 +119,10 @@ pip install -r requirements.txt
 python src/mqtt_pipeline/coletor_inferente_mqtt.py
 ```
 
-5. Visualizar análises:
+5. Execute o projeto no Wokwi:
+   Você pode visualizar e interagir com a simulação do projeto no Wokwi clicando [aqui](https://wokwi.com/projects/431525090602695681).
+
+6. Visualizar análises:
 ```bash
 jupyter notebook src/visualizacao/analise_inferencias.ipynb
 ```

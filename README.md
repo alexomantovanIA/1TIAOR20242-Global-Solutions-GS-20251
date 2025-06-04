@@ -128,7 +128,7 @@ jupyter notebook src/visualizacao/analise_inferencias.ipynb
 
 ## 📽️ Demonstração em Vídeo
 
-[🔗 Link para o vídeo demonstrativo (YouTube - não listado)](https://youtube.com/exemplo-nao-listado)
+[🔗 Link para o vídeo demonstrativo (YouTube - não listado)](https://youtu.be/nBH2K_tjtSo)
 
 ---
 

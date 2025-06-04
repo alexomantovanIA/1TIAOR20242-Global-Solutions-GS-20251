@@ -120,7 +120,7 @@ python src/mqtt_pipeline/coletor_inferente_mqtt.py
 ```
 
 5. Execute o projeto no Wokwi:
-   Você pode visualizar e interagir com a simulação do projeto no Wokwi clicando [aqui](https://wokwi.com/projects/431525090602695681).
+- Você pode visualizar e interagir com a simulação do projeto no Wokwi clicando [aqui](https://wokwi.com/projects/431525090602695681).
 
 6. Visualizar análises:
 ```bash

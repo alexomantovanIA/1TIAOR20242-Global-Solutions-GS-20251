@@ -1,10 +1,10 @@
 """
 Script: coletor_inferente_mqtt.py
-Descrição: Escuta um tópico MQTT, grava os dados recebidos em SQLite e realiza inferência imediata.
+Descrição: Escuta um tópico MQTT, grava os dados recebidos em PostgreSQL e realiza inferência imediata.
 Se a classe prevista for "risco", envia alerta via SNS e registra na tabela 'alertas'.
 """
 
-import sqlite3
+import psycopg2
 import json
 import paho.mqtt.client as mqtt
 import pandas as pd
@@ -20,7 +20,11 @@ import boto3
 
 # Caminhos
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "..", "..", "data", "gs_deslizamento.db")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = int(os.getenv("DB_PORT", 5432))
+DB_NAME = os.getenv("DB_NAME", "gs_deslizamento")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 MODEL_PATH = os.path.join(BASE_DIR, "..", "..", "ml", "modelo_multiclasse_ajustado_v2.pkl")
 
 # MQTT
@@ -53,14 +57,24 @@ with open(MODEL_PATH, "rb") as f:
 # 🧱 Inicializa o Banco de Dados
 # ================================
 
+def get_connection():
+    return psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+    )
+
+
 def inicializar_banco():
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_connection()
     cursor = conn.cursor()
 
     # Tabela de leituras
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS leituras (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             timestamp TEXT,
             umidade REAL,
             chuva REAL,
@@ -83,7 +97,7 @@ def inicializar_banco():
     # Tabela de alertas
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS alertas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             timestamp TEXT,
             umidade REAL,
             chuva REAL,
@@ -108,15 +122,15 @@ def on_message(client, userdata, msg):
         acc_z = float(payload.get("acc_z", 0))
         timestamp = datetime.now().isoformat()
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_connection()
         cursor = conn.cursor()
 
         # Grava leitura
-        cursor.execute("""
-            INSERT INTO leituras (timestamp, umidade, chuva, acc_z)
-            VALUES (?, ?, ?, ?)
-        """, (timestamp, umidade, chuva, acc_z))
-        leitura_id = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO leituras (timestamp, umidade, chuva, acc_z) VALUES (%s, %s, %s, %s) RETURNING id",
+            (timestamp, umidade, chuva, acc_z),
+        )
+        leitura_id = cursor.fetchone()[0]
         print(f"📥 Leitura gravada: ID={leitura_id} U={umidade} C={chuva} Z={acc_z}")
 
         # Realiza inferência
@@ -125,10 +139,10 @@ def on_message(client, userdata, msg):
         print(f"🔎 Classe inferida: {classe}")
 
         # Grava inferência
-        cursor.execute("""
-            INSERT INTO inferencias (id, timestamp, umidade, chuva, acc_z, classe)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (leitura_id, timestamp, umidade, chuva, acc_z, classe))
+        cursor.execute(
+            "INSERT INTO inferencias (id, timestamp, umidade, chuva, acc_z, classe) VALUES (%s, %s, %s, %s, %s, %s)",
+            (leitura_id, timestamp, umidade, chuva, acc_z, classe),
+        )
 
         # Se risco, envia alerta
         if classe == "risco":
@@ -153,10 +167,10 @@ def on_message(client, userdata, msg):
                 print("❌ Erro ao enviar alerta SNS:", e)
 
             # Grava o alerta
-            cursor.execute("""
-                INSERT INTO alertas (timestamp, umidade, chuva, acc_z, classe, alerta_enviado)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (timestamp, umidade, chuva, acc_z, classe, alerta_enviado))
+            cursor.execute(
+                "INSERT INTO alertas (timestamp, umidade, chuva, acc_z, classe, alerta_enviado) VALUES (%s, %s, %s, %s, %s, %s)",
+                (timestamp, umidade, chuva, acc_z, classe, alerta_enviado),
+            )
 
         conn.commit()
         conn.close()
